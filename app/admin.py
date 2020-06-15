@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+from .models import User, Question, Answer
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 
@@ -24,3 +24,5 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email', 'username')
 
 admin.site.register(User, CustomUserAdmin)
+admin.site.register(Question)
+admin.site.register(Answer)

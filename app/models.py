@@ -49,7 +49,7 @@ class Question(models.Model):
 class Answer(models.Model):
     question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer_body = models.TextField()
-    marks = models.DecimalField(max_digits=3, decimal_places=2)
+    marks = models.DecimalField(max_digits=6, decimal_places=2)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     evaluated = models.BooleanField(default=False)
     creation_date_time = models.DateTimeField(auto_now_add=True)
