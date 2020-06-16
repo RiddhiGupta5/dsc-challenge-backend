@@ -13,6 +13,7 @@
 
 ## Functionalities
 - [x]  Login using Oauth
+- [x]  Mapping both users google account and Instagram Account and transferring Marks
 - [x]  Questions will be picked randomly from a question bank
 - [x]  Answering questions
 - [x]  Autocorrection for daily question answers
