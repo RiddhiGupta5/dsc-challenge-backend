@@ -7,17 +7,21 @@
 </p>
 
 ---
-[![DOCS](https://img.shields.io/badge/Documentation-see%20docs-green?style=flat-square&logo=appveyor)](INSERT_LINK_FOR_DOCS_HERE) 
+[![DOCS](https://img.shields.io/badge/Documentation-see%20docs-green?style=flat-square&logo=appveyor)](https://documenter.getpostman.com/view/7638824/Szzj8J48?version=latest) 
   [![UI ](https://img.shields.io/badge/User%20Interface-Link%20to%20UI-orange?style=flat-square&logo=appveyor)](INSERT_UI_LINK_HERE)
 
 
 ## Functionalities
-- [ ]  Login using Oauth
-- [ ]  Bulk adding of questions to the DB
-- [ ]  Questions will be picked randomly from a question bank
-- [ ]  Answering questions
+- [x]  Login using Oauth
+- [x]  Questions will be picked randomly from a question bank
+- [x]  Answering questions
+- [x]  Autocorrection for daily question answers
 - [ ]  Maintain Score Leaderbord
-- [ ]  Seperate Leaderboard and question bank for specific domains
+- [ ]  Sending Alert when question bank becomes empty
+- [x]  Admin Panel 
+- [ ]  Answer Correction by Admin
+- [ ]  Bulk adding of questions to the DB by Admin
+- [ ]  Uploading Instagram responses by Admin
 
 <br>
 
