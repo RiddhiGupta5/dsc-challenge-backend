@@ -1,6 +1,7 @@
 import os
 import datetime
 import random
+from fuzzywuzzy import fuzz
 
 from django.utils import timezone
 
@@ -13,9 +14,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate, login, logout
 
 from .models import User, Question, Answer
-from .serializers import QuestionSerializer
+from .serializers import QuestionSerializer, AnswerSerializer
 
-class DailyQuestionView(APIView):
+class DailyQAView(APIView):
 
     def get(self, request):
         question_type = {
@@ -39,10 +40,61 @@ class DailyQuestionView(APIView):
         else:
             selected_question = question[0]
         serializer = QuestionSerializer(selected_question)
-        return Response({"message":"Question Found", "Question":serializer.data})
+        serializer = serializer.data
+        del serializer['correct_answer']
+        return Response({"message":"Question Found", "Question":serializer})
 
+    def post(self, request):
 
-class WeeklyQuestionView(APIView):
+        # Marking Scheme
+        CORRECT_MARKS = 10
+        WRONG_MARKS = 0
+
+        try:
+            question = Question.objects.get(id=request.data.get('question_id'))
+        except Question.DoesNotExist:
+            return Response({"message":"Invalid Question Id"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if question.question_type!=0:
+            return Response({"message":"Not a Daily Question"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            answer = Answer.objects.get(user_id=request.user.id, question_id=question.id)
+            return Response({"message":"Already Answered"}, status=status.HTTP_400_BAD_REQUEST)
+        except Answer.DoesNotExist:
+            if request.data.get('answer_body', None)==None:
+                return Response({"message":"Answer Body is Empty"}, status=status.HTTP_400_BAD_REQUEST)
+            if question.is_exact_match:
+                if request.data['answer_body'] == question.correct_answer:
+                    marks = CORRECT_MARKS
+                else:
+                    marks = WRONG_MARKS
+            else:
+                user_answer = request.data['answer_body']
+                correct_answer = question.correct_answer
+                match_percent = fuzz.token_set_ratio(user_answer, correct_answer)
+                if match_percent >= 89:
+                    marks = CORRECT_MARKS
+                else:
+                    marks = WRONG_MARKS
+            
+            answer = {
+                "question_id":question.id,
+                "answer_body":request.data['answer_body'],
+                "description":request.data.get('description', None),
+                "user_id":request.user.id,
+                "marks":marks,
+                "evaluated":True
+            }
+
+            serializer = AnswerSerializer(data=answer)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message":"Answer Saved Successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message":"Answer is Invalid"}, status=status.HTTP_400_BAD_REQUEST)
+
+class WeeklyQAView(APIView):
 
     def get(self, request):
         question_type = {
@@ -67,4 +119,38 @@ class WeeklyQuestionView(APIView):
         else:
             selected_question = question[0]
         serializer = QuestionSerializer(selected_question)
-        return Response({"message":"Question Found", "Question":serializer.data})
+        serializer = serializer.data
+        del serializer['correct_answer']
+        return Response({"message":"Question Found", "Question":serializer})
+
+    def post(self, request):
+        try:
+            question = Question.objects.get(id=request.data.get('question_id'))
+        except Question.DoesNotExist:
+            return Response({"message":"Invalid Question Id"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if question.question_type!=1:
+            return Response({"message":"Not a Weekly Question"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if request.data.get('answer_body', None)==None:
+                return Response({"message":"Answer Body is Empty"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            answer = Answer.objects.get(user_id=request.user.id, question_id=question.id)
+            answer.answer_body = request.data['answer_body']
+            answer.save()
+            return Response({"message":"Answered Updated"}, status=status.HTTP_400_BAD_REQUEST)
+        except Answer.DoesNotExist:            
+            answer = {
+                "question_id":question.id,
+                "answer_body":request.data['answer_body'],
+                "description":request.data.get('description', None),
+                "user_id":request.user.id
+            }
+
+            serializer = AnswerSerializer(data=answer)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message":"Answer Saved Successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message":"Answer is Invalid"}, status=status.HTTP_400_BAD_REQUEST)
