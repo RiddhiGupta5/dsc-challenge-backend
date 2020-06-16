@@ -9,6 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate, login, logout
 
 from .models import User, Question, Answer
+from .serializers import QuestionSerializer
 
 # View for Admin Signup
 class AdminSignupView(APIView):
@@ -71,3 +72,17 @@ class AdminLogoutView(APIView):
         response = {"message":"Admin logged out"}
         request.user.auth_token.delete()
         return Response(response, status=status.HTTP_200_OK)
+
+class QuestionView(APIView):
+
+    def post(self, request):
+        user = request.user
+        if user.is_superuser:
+            serializer = QuestionSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message":"Question saved"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"message":"Invalid question"}, )
+        else:
+            return Response({"message":"Only admin is allowed"}, status=status.HTTP_403_FORBIDDEN)
