@@ -38,6 +38,7 @@ class GoogleSignInView(APIView):
             user.username = idinfo['name']
             user.email = idinfo['email']
             user.password = make_password(BaseUserManager().make_random_password())
+            user.profile_image = idinfo['picture']
             user.save()
             
         token, _ = Token.objects.get_or_create(user=user)
@@ -48,6 +49,7 @@ class GoogleSignInView(APIView):
                 'username': user.username,
                 'email': user.email,
                 'insta_handle': user.insta_handle,
+                'profile_image': user.profile_image,
                 'platform': user.platform
             },
             'token': token.key

@@ -33,6 +33,7 @@ class AdminSignupView(APIView):
                     username=request.data['username'],
                     password=request.data['password'],
                     insta_handle=None,
+                    profile_image=None,
                     platform=0 
                 )
                 user = User.objects.get(email=request.data['email'])

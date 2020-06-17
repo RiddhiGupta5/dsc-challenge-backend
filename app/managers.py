@@ -5,11 +5,11 @@ from django.utils.translation import ugettext_lazy as _
 class CustomUserManager(BaseUserManager):
     
     #Create user with email and password
-    def create_user(self, email, password, username, platform, insta_handle, **extra_fields):
+    def create_user(self, email, password, username, platform, insta_handle, profile_image, **extra_fields):
         if not email:
             raise ValueError(_('The Email must be set'))
         email = self.normalize_email(email)
-        user = self.model(email=email, username=username, platform=platform, insta_handle=insta_handle, **extra_fields)
+        user = self.model(email=email, username=username, platform=platform, insta_handle=insta_handle, profile_image=profile_image, **extra_fields)
         user.set_password(password)
         user.save()
         return user
