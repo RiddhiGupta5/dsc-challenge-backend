@@ -16,31 +16,27 @@ class AdminSignupView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        req_data = {}
-        req_data['email'] = request.data.get("email", None)
-        req_data['username'] = request.data.get("username", None)
-        req_data['password'] = request.data.get("password", None) 
 
         # Hardcoded the password and email address
-        if (req_data.get('password', None)==os.getenv('ADMIN_PASSWORD') and 
-            req_data.get('username', None)==os.getenv('ADMIN_USERNAME') and 
-            req_data.get('email', None)==os.getenv('ADMIN_EMAIL_ID')):
+        if (request.data.get('password', None)==os.getenv('ADMIN_PASSWORD') and 
+            request.data.get('username', None)==os.getenv('ADMIN_USERNAME') and 
+            request.data.get('email', None)==os.getenv('ADMIN_EMAIL_ID')):
 
             try:
                 # Checking if Admin already signed up
-                user = User.objects.get(email=req_data['email'])
+                user = User.objects.get(email=request.data['email'])
                 return Response({"message":"Admin already signed Up"}, status=status.HTTP_400_BAD_REQUEST)
             except User.DoesNotExist:
                 # Creating superuser (Admin)
                 User.objects.create_superuser(
-                    email=req_data['email'],
-                    username=req_data['username'],
-                    password=req_data['password'],
+                    email=request.data['email'],
+                    username=request.data['username'],
+                    password=request.data['password'],
                     insta_handle=None,
                     platform=0 
                 )
-                user = User.objects.get(email=req_data['email'])
-                return Response({"message":"Admin Signed up"}, status=status.HTTP_400_BAD_REQUEST)
+                user = User.objects.get(email=request.data['email'])
+                return Response({"message":"Admin Signed up"}, status=status.HTTP_200_OK)
 
         else:            
             return Response({"message":"Invalid Email and Password"}, status=status.HTTP_400_BAD_REQUEST)
@@ -50,8 +46,7 @@ class AdminLoginView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        req_data = request.data
-        user = authenticate(email=req_data['email'], password=req_data['password'])
+        user = authenticate(email=request.data.get('email', None), password=request.data.get('password',None))
 
         if not user:
             return Response({"message":"Invalid Details"}, status=status.HTTP_400_BAD_REQUEST)
@@ -68,7 +63,6 @@ class AdminLogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
-        user = request.user
         response = {"message":"Admin logged out"}
         request.user.auth_token.delete()
         return Response(response, status=status.HTTP_200_OK)
@@ -76,8 +70,7 @@ class AdminLogoutView(APIView):
 class QuestionView(APIView):
 
     def post(self, request):
-        user = request.user
-        if user.is_superuser:
+        if request.user.is_superuser:
             serializer = QuestionSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()

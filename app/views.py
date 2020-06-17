@@ -1,10 +1,9 @@
-import os
-
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
+from django.conf import settings
 
 from rest_framework import status
 from rest_framework.utils import json
@@ -15,16 +14,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import User, Question, Answer
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 
 class GoogleSignInView(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        client_id = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+        client_id = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
 
         try:
             idinfo = id_token.verify_oauth2_token(request.data['id_token'], requests.Request(), client_id)
