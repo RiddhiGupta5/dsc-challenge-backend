@@ -24,7 +24,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'insta_handle', 'platform']
+    REQUIRED_FIELDS = ['username', 'insta_handle', 'platform', 'profile_image']
 
     objects = CustomUserManager()
 
