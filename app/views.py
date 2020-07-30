@@ -24,6 +24,8 @@ class GoogleSignInView(APIView):
         try:
             idinfo = id_token.verify_oauth2_token(request.data['id_token'], requests.Request(), client_id)
         except Exception as error:
+            print(error.message)
+            print(error)
             return Response({"message": "Something went wrong"}, status=status.HTTP_403_FORBIDDEN)
         # print(idinfo['email'])
         # print(idinfo['name'])
