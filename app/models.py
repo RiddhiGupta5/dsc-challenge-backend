@@ -8,7 +8,7 @@ from .managers import CustomUserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    
+
     # PLATFORM
     # 0 - App or website
     # 1 - Instagram
@@ -18,9 +18,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     platform = models.IntegerField(default=0)
     insta_handle = models.CharField(max_length=50, default=None, null=True)
     profile_image = models.URLField(null=True, default=None)
-    is_staff = models.BooleanField(default=False)       # Field necessary for a django user
-    is_active = models.BooleanField(default=True)       # Field necessary for a django user
-    is_superuser = models.BooleanField(default=False)   # Field necessary for a django user
+    # Field necessary for a django user
+    is_staff = models.BooleanField(default=False)
+    # Field necessary for a django user
+    is_active = models.BooleanField(default=True)
+    # Field necessary for a django user
+    is_superuser = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
     USERNAME_FIELD = 'email'
@@ -31,6 +34,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+
 class Question(models.Model):
 
     # QUESTION TYPE:
@@ -39,13 +43,14 @@ class Question(models.Model):
 
     question_body = models.TextField()
     display_date = models.DateTimeField(default=None, null=True)
-    correct_answer = models.CharField(max_length=50)
+    correct_answer = models.CharField(max_length=50, null=True)
     question_type = models.IntegerField()
-    is_exact_match = models.BooleanField(default=False)
+    is_exact_match = models.BooleanField(default=False, null=True)
     creation_date_time = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-creation_date_time']
+
 
 class Answer(models.Model):
     question_id = models.ForeignKey(Question, on_delete=models.CASCADE)
