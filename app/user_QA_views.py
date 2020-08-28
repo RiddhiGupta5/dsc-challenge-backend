@@ -227,3 +227,21 @@ class LeaderBoardView(APIView):
             last_marks = item['marks']
 
         return Response({"message": "Generated Results", "Result": result}, status=status.HTTP_200_OK)
+
+
+class HistoryView(APIView):
+
+    def get(self, request):
+        user = request.user
+        answers = Answer.objects.filter(user_id=user.id)
+        result = []
+        for answer in answers:
+            result.append({
+                "question": answer.question_id.question_body,
+                "display_date": answer.question_id.display_date,
+                "your_answer": answer.answer_body,
+                "correct_answer": answer.question_id.correct_answer,
+                "marks": answer.marks,
+                "question_type": answer.question_id.question_type
+            })
+        return Response({"message": "Found History", "history": result}, status=status.HTTP_200_OK)
