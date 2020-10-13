@@ -242,6 +242,7 @@ class HistoryView(APIView):
                 "your_answer": answer.answer_body,
                 "correct_answer": answer.question_id.correct_answer,
                 "marks": answer.marks,
-                "question_type": answer.question_id.question_type
+                "question_type": answer.question_id.question_type,
+                "is_evaluated": answer.evaluated
             })
         return Response({"message": "Found History", "history": result}, status=status.HTTP_200_OK)
